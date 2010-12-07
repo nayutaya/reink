@@ -36,4 +36,4 @@ plugin = Reink::Plugin::Plugins.find { |params| params[:url_pattern] =~ url }
 article = plugin[:generator].call(logger, http, url)
 
 
-STDOUT.write(article["file"])
+STDOUT.write(article[:filebody])

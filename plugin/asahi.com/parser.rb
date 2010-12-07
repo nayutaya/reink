@@ -6,13 +6,13 @@ require "nokogiri"
 
 module Asahi
   module Parser
-    def self.extract(src, url)
+    def self.parse(src, url)
       return {
-        "url"            => url,
-        "title"          => self.extract_title(src),
-        "published_time" => self.extract_published_time(src),
-        "images"         => self.extract_images(src, url),
-        "body"           => self.extract_body(src),
+        :url            => url,
+        :title          => self.extract_title(src),
+        :published_time => self.extract_published_time(src),
+        :images         => self.extract_images(src, url),
+        :body           => self.extract_body(src),
       }
     end
 
@@ -35,13 +35,13 @@ module Asahi
         img     = parag.xpath('.//img').first || next
         url     = URI.join(url, img[:src]).to_s
         caption = parag.xpath('./small/text()').text.strip
-        {"url" => url, "caption" => caption}
+        {:url => url, :caption => caption}
       }.compact
       images += doc.xpath('//*[@id="HeadLine"]//div[@class="ThmbCol"]//p').map { |parag|
         img     = parag.xpath('.//img').first || next
         url     = URI.join(url, img[:src]).to_s
         caption = parag.xpath('./small/text()').text.strip
-        {"url" => url, "caption" => caption}
+        {:url => url, :caption => caption}
       }.compact
       return images
     end

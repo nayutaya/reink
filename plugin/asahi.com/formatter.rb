@@ -11,11 +11,11 @@ module Asahi
       env = Object.new
       env.extend(ERB::Util)
       env.instance_eval {
-        @url            = article["url"]
-        @title          = article["title"]
-        @published_time = article["published_time"]
-        @images         = article["images"]
-        @body           = article["body"]
+        @url            = article[:url]
+        @title          = article[:title]
+        @published_time = article[:published_time]
+        @images         = article[:images]
+        @body           = article[:body]
       }
 
       erb = ERB.new(template, nil, "-")
