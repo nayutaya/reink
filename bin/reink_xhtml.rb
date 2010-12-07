@@ -31,6 +31,7 @@ http   = create_http_client(logger)
 #p Reink::Plugin::Plugins
 
 url = "http://www.asahi.com/international/update/1208/TKY201012070526.html"
+#url = "http://www.asahi.com/international/update/1207/TKY201012070409.html?ref=reca"
 
 plugin = Reink::Plugin::Plugins.find { |params| params[:url_pattern] =~ url }
 article = plugin[:generator].call(logger, http, url)
