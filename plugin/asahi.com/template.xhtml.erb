@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title><%= h(@title) %></title>
+  <style type="text/css">
+   h1 { }
+   p { margin-top: 1em; margin-bottom: 0em; text-indent: 1em; }
+   #info { font-size: xx-small; text-align: right; }
+   #body { }
+   .image { text-align: center; }
+   .caption { text-align: center; }
+  </style>
+ </head>
+ <body>
+  <h1><%= h(@title) %></h1>
+  <div id="info">
+   <%= h(@published_time.strftime("%Y年%m月%d日%H時%M分")) %>
+   | <a href="<%= h(@url) %>">原文へ</a>
+  </div>
+  <%- unless @images.empty? -%>
+   <hr/>
+   <%- @images.each { |image| -%>
+    <div>
+     <div class="image"><img src="<%= h(image["filename"]) %>"/></div>
+     <div class="caption"><%= h(image["caption"]) %></div>
+    </div>
+   <%- } -%>
+  <%- end -%>
+  <hr/>
+  <div id="body">
+   <%= @body %>
+  </div>
+  <hr/>
+ </body>
+</html>
