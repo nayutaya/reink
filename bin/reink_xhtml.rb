@@ -8,8 +8,7 @@ require File.join(File.dirname(__FILE__), "..", "lib", "http", "message_pack_sto
 require File.join(File.dirname(__FILE__), "..", "plugin", "plugin")
 
 def create_http_client(logger)
-  #store = HttpClient::MessagePackStore.new(File.join(File.dirname(__FILE__), "..", "cache"))
-  store = nil
+  store = HttpClient::MessagePackStore.new(File.join(File.dirname(__FILE__), "..", "cache"))
   return HttpClient::Factory.create_client(
     :logger   => logger,
     :interval => 1.0,
