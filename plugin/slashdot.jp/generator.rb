@@ -2,7 +2,7 @@
 
 require "cgi"
 require "uri"
-require "digest/md5"
+require "digest/sha1"
 require "rubygems"
 require "nokogiri"
 require File.join(File.dirname(__FILE__), "parser")
@@ -17,7 +17,7 @@ module Slashdot
       article       = Parser.parse(src, commented_url)
 
       article[:filebody] = Formatter.format(article)
-      article[:filename] = Digest::MD5.hexdigest(article[:url]) + ".xhtml"
+      article[:filename] = self.create_filename(article[:url], ".xhtml")
       article[:filetype] = "application/xhtml+xml"
 
       return article
@@ -55,6 +55,10 @@ module Slashdot
       uri = URI.parse(url)
       uri.query = self.build_query(self.parse_query(uri.query).merge(params))
       return uri.to_s
+    end
+
+    def self.create_filename(url, ext)
+      return "slashdot_#{Digest::SHA1.hexdigest(url)[0, 20]}.#{ext}"
     end
   end
 end
