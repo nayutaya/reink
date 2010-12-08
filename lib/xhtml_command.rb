@@ -4,9 +4,9 @@ require "optparse"
 require "rubygems"
 require "log4r"
 require File.join(File.dirname(__FILE__), "version")
+require File.join(File.dirname(__FILE__), "plugin")
 require File.join(File.dirname(__FILE__), "http", "factory")
 require File.join(File.dirname(__FILE__), "http", "message_pack_store")
-require File.join(File.dirname(__FILE__), "..", "plugin", "plugin")
 
 module Reink
   module XhtmlCommand

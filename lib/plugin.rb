@@ -6,7 +6,7 @@ module Reink
   end
 end
 
-plugin_dir = File.dirname(__FILE__)
+plugin_dir = File.join(File.dirname(__FILE__), "..", "plugin")
 manifests  = Dir.glob(File.join(plugin_dir, "*", "manifest.rb"))
 manifests.sort.each { |manifest|
   require(manifest)
