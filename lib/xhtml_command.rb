@@ -17,8 +17,8 @@ module Reink
       url    = params[:url]
 
       plugin    = Reink::Plugin.find_by_url(url) || raise("no such plugin for #{url}")
-      generator = plugin[:generator]
-      article   = generator.call(logger, http, url)
+      generator = plugin[:generator].call
+      article   = generator.generate(http, url)
       content   = article[:filebody]
 
       STDOUT.write(content)

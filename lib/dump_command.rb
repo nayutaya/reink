@@ -21,8 +21,8 @@ module Reink
       http   = self.create_http_client(logger, interval)
 
       plugin    = Reink::Plugin.find_by_url(url) || raise("no such plugin for #{url}")
-      generator = plugin[:generator]
-      article   = generator.call(logger, http, url)
+      generator = plugin[:generator].call
+      article   = generator.generate(http, url)
 
       self.write_body(logger, article, output_dir)
       self.write_images(logger, article, output_dir)
