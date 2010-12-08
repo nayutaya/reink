@@ -11,16 +11,19 @@ require File.join(File.dirname(__FILE__), "http", "message_pack_store")
 module Reink
   module DumpCommand
     def self.main(argv)
-      params = self.parse_options(argv)
-      logger = self.create_logger(params[:log_level])
-      http   = self.create_http_client(logger, params[:interval])
-      url    = params[:url]
+      options    = self.parse_options(argv)
+      url        = options[:url]
+      output_dir = options[:output_dir]
+      interval   = options[:interval]
+      log_level  = options[:log_level]
+
+      logger = self.create_logger(log_level)
+      http   = self.create_http_client(logger, interval)
 
       plugin    = Reink::Plugin.find_by_url(url) || raise("no such plugin for #{url}")
       generator = plugin[:generator]
       article   = generator.call(logger, http, url)
 
-      output_dir = "."
       self.write_body(logger, article, output_dir)
       self.write_images(logger, article, output_dir)
     rescue RuntimeError => e
@@ -28,23 +31,30 @@ module Reink
     end
 
     def self.parse_options(argv)
-      log_levels = [:off, :fatal, :error, :warn, :info, :debug]
-      params = {
-        :url       => nil,
-        :interval  => 1.0,
-        :log_level => :info,
+      options = {
+        :url        => nil,
+        :output_dir => ".",
+        :interval   => 1.0,
+        :log_level  => :info,
       }
+
+      log_levels = [:off, :fatal, :error, :warn, :info, :debug]
       OptionParser.new { |opt|
         opt.version = Reink::VERSION
         # TODO: -c --cache-dir=DIR を追加
-        opt.on("-i", "--interval=SECOND", Float)      { |v| params[:interval]  = v }
-        opt.on("-l", "--log-level=LEVEL", log_levels) { |v| params[:log_level] = v }
-        opt.on("-v", "--verbose")                     { |v| params[:log_level] = :debug }
+        opt.on("-o", "--output-dir=DIR", String)      { |v| options[:output_dir] = v }
+        opt.on("-i", "--interval=SECOND", Float)      { |v| options[:interval]   = v }
+        opt.on("-l", "--log-level=LEVEL", log_levels) { |v| options[:log_level]  = v }
+        opt.on("-v", "--verbose")                     { |v| options[:log_level]  = :debug }
         opt.parse!(argv)
       }
-      params[:url] = argv.shift || raise(OptionParser::MissingArgument, "url")
-      return params
-    rescue OptionParser::ParseError => e
+
+      options[:url] = argv.shift || raise(OptionParser::MissingArgument, "url")
+
+      raise("no such directory -- #{options[:output_dir]}") unless File.directory?(options[:output_dir])
+
+      return options
+    rescue RuntimeError, OptionParser::ParseError => e
       self.abort(e)
     end
 
