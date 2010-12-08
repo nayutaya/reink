@@ -40,9 +40,10 @@ module Reink
 
       log_levels = [:off, :fatal, :error, :warn, :info, :debug]
       OptionParser.new { |opt|
-        opt.version = Reink::VERSION
-        # TODO: -c --cache-dir=DIR を追加
+        opt.program_name = "reink dump"
+        opt.version      = Reink::VERSION
         opt.on("-o", "--output-dir=DIR", String)      { |v| options[:output_dir] = v }
+        # TODO: -c --cache-dir=DIR を追加
         opt.on("-i", "--interval=SECOND", Float)      { |v| options[:interval]   = v }
         opt.on("-l", "--log-level=LEVEL", log_levels) { |v| options[:log_level]  = v }
         opt.on("-v", "--verbose")                     { |v| options[:log_level]  = :debug }

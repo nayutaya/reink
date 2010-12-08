@@ -34,7 +34,8 @@ module Reink
         :log_level => :info,
       }
       OptionParser.new { |opt|
-        opt.version = Reink::VERSION
+        opt.program_name = "reink xhtml"
+        opt.version      = Reink::VERSION
         # TODO: -c --cache-dir=DIR を追加
         opt.on("-i", "--interval=SECOND", Float)      { |v| params[:interval]  = v }
         opt.on("-l", "--log-level=LEVEL", log_levels) { |v| params[:log_level] = v }
