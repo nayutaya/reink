@@ -5,15 +5,15 @@ require "rubygems"
 require "nokogiri"
 
 module TechOn
-  module ArticleParser
+  module Parser
     def self.extract(src, url)
       return {
-        "url"            => url,
-        "title"          => self.extract_title(src),
-        "published_time" => self.extract_published_time(src),
-        "author"         => self.extract_author(src),
-        "images"         => self.extract_images(src, url),
-        "body"           => self.extract_body(src, url),
+        :url            => url,
+        :title          => self.extract_title(src),
+        :published_time => self.extract_published_time(src),
+        :author         => self.extract_author(src),
+        :images         => self.extract_images(src, url),
+        :body           => self.extract_body(src, url),
       }
     end
 
@@ -46,7 +46,7 @@ module TechOn
         path    = div.xpath('./div[@class="bpimage_image"]//img').first[:src]
         url     = URI.join(url, path).to_s
         caption = div.xpath('./div[@class="bpimage_caption"]//text()').text.strip
-        {"url" => url, "caption" => caption}
+        {:url => url, :caption => caption}
       }
     end
 

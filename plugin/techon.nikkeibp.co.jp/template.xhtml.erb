@@ -24,8 +24,8 @@
    <hr/>
    <%- @images.each { |image| -%>
     <div>
-     <div class="image"><img src="<%= h(image["filename"]) %>"/></div>
-     <div class="caption"><%= h(image["caption"]) %></div>
+     <div class="image"><img src="<%= h(image[:filename]) %>"/></div>
+     <div class="caption"><%= h(image[:caption]) %></div>
     </div>
    <%- } -%>
   <%- end -%>

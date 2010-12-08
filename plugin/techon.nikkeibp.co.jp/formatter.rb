@@ -3,7 +3,7 @@
 require "erb"
 
 module TechOn
-  module ArticleFormatter
+  module Formatter
     def self.format(article)
       filename = File.join(File.dirname(__FILE__), "template.xhtml.erb")
       template = File.open(filename, "rb") { |file| file.read }
@@ -11,12 +11,12 @@ module TechOn
       env = Object.new
       env.extend(ERB::Util)
       env.instance_eval {
-        @url            = article["url"]
-        @title          = article["title"]
-        @published_time = article["published_time"]
-        @author         = article["author"]
-        @images         = article["images"]
-        @body           = article["body"]
+        @url            = article[:url]
+        @title          = article[:title]
+        @published_time = article[:published_time]
+        @author         = article[:author]
+        @images         = article[:images]
+        @body           = article[:body]
       }
 
       erb = ERB.new(template, nil, "-")

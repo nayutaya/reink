@@ -1,30 +1,30 @@
 # coding: utf-8
 
 require "digest/md5"
-require File.join(File.dirname(__FILE__), "article_parser")
-require File.join(File.dirname(__FILE__), "article_formatter")
+require File.join(File.dirname(__FILE__), "parser")
+require File.join(File.dirname(__FILE__), "formatter")
 
 module TechOn
-  module Article
-    def self.get(http, url)
+  module Generator
+    def self.generate(http, url)
       curl    = self.get_canonical_url(http, url)
       src     = http.get(curl)
-      article = ArticleParser.extract(src, curl)
+      article = Parser.extract(src, curl)
 
-      article["images"].each { |image|
+      article[:images].each { |image|
         filename, type =
-          case image["url"]
-          when /\.jpg$/i then [Digest::MD5.hexdigest(image["url"]) + ".jpg", "image/jpeg"]
+          case image[:url]
+          when /\.jpg$/i then [Digest::MD5.hexdigest(image[:url]) + ".jpg", "image/jpeg"]
           else raise("unknown type")
           end
-        image["file"]     = http.get(image["url"])
-        image["filename"] = filename
-        image["type"]     = type
+        image[:filebody] = http.get(image[:url])
+        image[:filename] = filename
+        image[:filetype] = type
       }
 
-      article["file"]     = ArticleFormatter.format(article)
-      article["filename"] = Digest::MD5.hexdigest(article["url"]) + ".xhtml"
-      article["type"]     = "application/xhtml+xml"
+      article[:filebody] = Formatter.format(article)
+      article[:filename] = Digest::MD5.hexdigest(article[:url]) + ".xhtml"
+      article[:filetype] = "application/xhtml+xml"
 
       return article
     end
