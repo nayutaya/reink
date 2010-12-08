@@ -1,0 +1,43 @@
+# coding: utf-8
+
+require "rubygems"
+require "log4r"
+require File.join(File.dirname(__FILE__), "http", "factory")
+require File.join(File.dirname(__FILE__), "http", "message_pack_store")
+require File.join(File.dirname(__FILE__), "..", "plugin", "plugin")
+
+module Reink
+  module XhtmlCommand
+    def self.main(argv)
+      logger = self.create_logger
+      http   = self.create_http_client(logger)
+
+      #p Reink::Plugin::Plugins
+
+      url = "http://www.asahi.com/international/update/1208/TKY201012070526.html"
+      #url = "http://www.asahi.com/international/update/1207/TKY201012070409.html?ref=reca"
+
+      plugin = Reink::Plugin::Plugins.find { |params| params[:url_pattern] =~ url }
+      article = plugin[:generator].call(logger, http, url)
+
+      STDOUT.write(article[:filebody])
+    end
+
+    def self.create_http_client(logger)
+      store = HttpClient::MessagePackStore.new(File.join(File.dirname(__FILE__), "..", "cache"))
+      return HttpClient::Factory.create_client(
+        :logger   => logger,
+        :interval => 1.0,
+        :store    => store)
+    end
+
+    def self.create_logger
+      formatter = Log4r::PatternFormatter.new(:pattern => "%d [%l] %M", :date_pattern => "%H:%M:%S")
+      outputter = Log4r::StderrOutputter.new("", :formatter => formatter)
+      logger = Log4r::Logger.new($0)
+      logger.add(outputter)
+      logger.level = Log4r::DEBUG
+      return logger
+    end
+  end
+end
