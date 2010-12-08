@@ -17,7 +17,7 @@ module Slashdot
       article       = Parser.parse(src, commented_url)
 
       article[:filebody] = Formatter.format(article)
-      article[:filename] = self.create_filename(article[:url], ".xhtml")
+      article[:filename] = self.create_filename(article[:url], "xhtml")
       article[:filetype] = "application/xhtml+xml"
 
       return article
