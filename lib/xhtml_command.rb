@@ -16,9 +16,7 @@ module Reink
       http   = self.create_http_client(logger)
       url    = params[:url]
 
-      plugin = Reink::Plugin::Plugins.find { |params| params[:url_pattern] =~ url }
-      raise("no such plugin for #{url}") unless plugin
-
+      plugin    = Reink::Plugin.find_by_url(url) || raise("no such plugin for #{url}")
       generator = plugin[:generator]
       article   = generator.call(logger, http, url)
       content   = article[:filebody]
