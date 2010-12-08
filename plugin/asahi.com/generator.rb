@@ -1,6 +1,6 @@
 # coding: utf-8
 
-require "digest/md5"
+require "digest/sha1"
 require "rubygems"
 require "nokogiri"
 require File.join(File.dirname(__FILE__), "parser")
@@ -29,12 +29,12 @@ module Asahi
           else raise("unknown type")
           end
         image[:filebody] = http.get(image_url)
-        image[:filename] = "asahi#{Digest::MD5.hexdigest(image_url)}.#{ext}"
+        image[:filename] = self.create_filename(image_url, ext)
         image[:filetype] = type
       }
 
       article[:filebody] = Formatter.format(article)
-      article[:filename] = "asahi#{Digest::MD5.hexdigest(article[:url])}.xhtml"
+      article[:filename] = self.create_filename(article[:url], "xhtml")
       article[:filetype] = "application/xhtml+xml"
 
       return article
@@ -58,6 +58,10 @@ module Asahi
         map { |path| URI.join(url, path).to_s }
 
       return urls.uniq
+    end
+
+    def self.create_filename(url, ext)
+      return "asahi_#{Digest::SHA1.hexdigest(url)[0, 20]}.#{ext}"
     end
   end
 end
