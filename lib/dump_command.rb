@@ -19,9 +19,14 @@ module Reink
       plugin    = Reink::Plugin.find_by_url(url) || raise("no such plugin for #{url}")
       generator = plugin[:generator]
       article   = generator.call(logger, http, url)
-      content   = article[:filebody]
+      content   = 
 
-      STDOUT.write(content)
+      output_dir = "."
+
+      filename = File.join(output_dir, article[:filename])
+      File.open(filename, "wb") { |file|
+        file.write(article[:filebody])
+      }
     rescue RuntimeError => e
       self.abort(e)
     end
