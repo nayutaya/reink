@@ -1,0 +1,17 @@
+#! ruby -Ku
+# coding: utf-8
+
+case ARGV.shift
+when "xhtml"
+  require(File.join(File.dirname(__FILE__), "..", "lib", "xhtml_command"))
+  Reink::XhtmlCommand.main(ARGV)
+when "dump"
+  require(File.join(File.dirname(__FILE__), "..", "lib", "dump_command"))
+  Reink::DumpCommand.main(ARGV)
+else
+  STDERR.puts("Usage: reink COMMAND [options]")
+  STDERR.puts("Commands:")
+  STDERR.puts("  xhtml")
+  STDERR.puts("  dump")
+  exit(1)
+end
