@@ -19,14 +19,10 @@ module Reink
       plugin    = Reink::Plugin.find_by_url(url) || raise("no such plugin for #{url}")
       generator = plugin[:generator]
       article   = generator.call(logger, http, url)
-      content   = 
 
       output_dir = "."
-
-      filename = File.join(output_dir, article[:filename])
-      File.open(filename, "wb") { |file|
-        file.write(article[:filebody])
-      }
+      self.write_body(logger, article, output_dir)
+      self.write_images(logger, article, output_dir)
     rescue RuntimeError => e
       self.abort(e)
     end
@@ -81,6 +77,24 @@ module Reink
         :logger   => logger,
         :interval => interval,
         :store    => store)
+    end
+
+    def self.write_body(logger, article, output_dir)
+      filename = File.join(output_dir, article[:filename])
+      File.open(filename, "wb") { |file|
+        file.write(article[:filebody])
+      }
+      logger.info("wrote #{filename}")
+    end
+
+    def self.write_images(logger, article, output_dir)
+      article[:images].each { |image|
+        filename = File.join(output_dir, image[:filename])
+        File.open(filename, "wb") { |file|
+          file.write(image[:filebody])
+        }
+        logger.info("wrote #{filename}")
+      }
     end
   end
 end
