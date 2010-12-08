@@ -13,7 +13,7 @@ module Reink
     def self.main(argv)
       params = self.parse_options(argv)
       logger = self.create_logger(params[:log_level])
-      http   = self.create_http_client(logger)
+      http   = self.create_http_client(logger, params[:interval])
       url    = params[:url]
 
       plugin    = Reink::Plugin.find_by_url(url) || raise("no such plugin for #{url}")
@@ -22,7 +22,7 @@ module Reink
       content   = article[:filebody]
 
       STDOUT.write(content)
-    rescue => e
+    rescue RuntimeError => e
       self.abort(e)
     end
 
@@ -30,10 +30,13 @@ module Reink
       log_levels = [:off, :fatal, :error, :warn, :info, :debug]
       params = {
         :url       => nil,
+        :interval  => 1.0,
         :log_level => :info,
       }
       OptionParser.new { |opt|
         opt.version = Reink::VERSION
+        # TODO: -c --cache-dir=DIR を追加
+        opt.on("-i", "--interval=SECOND", Float)      { |v| params[:interval]  = v }
         opt.on("-l", "--log-level=LEVEL", log_levels) { |v| params[:log_level] = v }
         opt.on("-v", "--verbose")                     { |v| params[:log_level] = :debug }
         opt.parse!(argv)
@@ -48,14 +51,6 @@ module Reink
       name = File.basename($0, ".rb")
       STDERR.puts("#{name}: #{exception.message}")
       exit(1)
-    end
-
-    def self.create_http_client(logger)
-      store = HttpClient::MessagePackStore.new(File.join(File.dirname(__FILE__), "..", "cache"))
-      return HttpClient::Factory.create_client(
-        :logger   => logger,
-        :interval => 1.0,
-        :store    => store)
     end
 
     def self.create_logger(log_level)
@@ -73,6 +68,14 @@ module Reink
         when :debug then Log4r::DEBUG
         end
       return logger
+    end
+
+    def self.create_http_client(logger, interval)
+      store = HttpClient::MessagePackStore.new(File.join(File.dirname(__FILE__), "..", "cache"))
+      return HttpClient::Factory.create_client(
+        :logger   => logger,
+        :interval => interval,
+        :store    => store)
     end
   end
 end
