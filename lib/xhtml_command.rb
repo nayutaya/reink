@@ -10,32 +10,46 @@ require File.join(File.dirname(__FILE__), "..", "plugin", "plugin")
 
 module Reink
   module XhtmlCommand
-    LOG_LEVELS = [:off, :fatal, :error, :warn, :info, :debug]
-
     def self.main(argv)
-      params = {:log_level => :info}
-      opts = OptionParser.new
-      opts.version = Reink::VERSION
-      opts.on("-l", "--log-level LEVEL", LOG_LEVELS) { |v| params[:log_level] = v }
-      opts.parse!(argv)
-
-      p params
-
+      params = self.parse_options(argv)
       logger = self.create_logger(params[:log_level])
       http   = self.create_http_client(logger)
-
-      #p Reink::Plugin::Plugins
-
-      url = "http://www.asahi.com/international/update/1208/TKY201012070526.html"
-      #url = "http://www.asahi.com/international/update/1207/TKY201012070409.html?ref=reca"
+      url    = params[:url]
 
       plugin = Reink::Plugin::Plugins.find { |params| params[:url_pattern] =~ url }
-      article = plugin[:generator].call(logger, http, url)
+      raise("no such plugin for #{url}") unless plugin
 
-#      STDOUT.write(article[:filebody])
-    rescue OptionParser::InvalidArgument => e
+      generator = plugin[:generator]
+      article   = generator.call(logger, http, url)
+      content   = article[:filebody]
+
+      STDOUT.write(content)
+    rescue => e
+      self.abort(e)
+    end
+
+    def self.parse_options(argv)
+      log_levels = [:off, :fatal, :error, :warn, :info, :debug]
+      params = {
+        :url       => nil,
+        :log_level => :info,
+      }
+      OptionParser.new { |opt|
+        opt.version = Reink::VERSION
+        opt.on("-l", "--log-level=LEVEL", log_levels) { |v| params[:log_level] = v }
+        opt.on("-v", "--verbose")                     { |v| params[:log_level] = :debug }
+        opt.parse!(argv)
+      }
+      params[:url] = argv.shift || raise(OptionParser::MissingArgument, "url")
+      return params
+    rescue OptionParser::ParseError => e
+      self.abort(e)
+    end
+
+    def self.abort(exception)
       name = File.basename($0, ".rb")
-      STDERR.puts("#{name}: #{e.message}")
+      STDERR.puts("#{name}: #{exception.message}")
+      exit(1)
     end
 
     def self.create_http_client(logger)
