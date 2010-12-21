@@ -3,8 +3,12 @@
 module Reink
   module Epub
     class ContainerXml
+      def initialize
+        @body = File.open(File.join(File.dirname(__FILE__), "container.xml"), "rb") { |file| file.read }
+      end
+
       def to_s
-        return File.open(File.join(File.dirname(__FILE__), "container.xml"), "rb") { |file| file.read }
+        return @body
       end
     end
   end
