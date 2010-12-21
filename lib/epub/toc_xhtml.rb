@@ -24,7 +24,7 @@ end
 
 if $0 == __FILE__
   toc_xhtml = Reink::Epub::TocXhtml.new
-  toc_xhtml.items << {:href => "HREF", :title => "TITLE"}
-  toc_xhtml.items << {:href => "HREF", :title => "TITLE"}
+  toc_xhtml.items << {:href => "HREF1", :title => "TITLE1"}
+  toc_xhtml.items << {:href => "HREF2", :title => "TITLE2"}
   puts(toc_xhtml.to_s)
 end

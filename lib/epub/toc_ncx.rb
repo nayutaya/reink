@@ -30,7 +30,7 @@ if $0 == __FILE__
   toc_ncx.uuid   = "UUID"
   toc_ncx.title  = "TITLE"
   toc_ncx.author = "AUTHOR"
-  toc_ncx.nav_points << {:label_text => "LABEL-TEXT", :content_src => "CONTENT-SRC"}
-  toc_ncx.nav_points << {:label_text => "LABEL-TEXT", :content_src => "CONTENT-SRC"}
+  toc_ncx.nav_points << {:label_text => "LABEL-TEXT1", :content_src => "CONTENT-SRC1"}
+  toc_ncx.nav_points << {:label_text => "LABEL-TEXT2", :content_src => "CONTENT-SRC2"}
   puts(toc_ncx.to_s)
 end

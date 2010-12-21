@@ -33,7 +33,9 @@ if $0 == __FILE__
   content_opf.title     = "TITLE"
   content_opf.author    = "AUTHOR"
   content_opf.publisher = "PUBLISHER"
-  content_opf.items    << {:id => "ID", :href => "HREF", :type => "TYPE"}
-  content_opf.itemrefs << {:idref => "IDREF"}
+  content_opf.items    << {:id => "ID1", :href => "HREF1", :type => "TYPE1"}
+  content_opf.items    << {:id => "ID2", :href => "HREF2", :type => "TYPE2"}
+  content_opf.itemrefs << {:idref => "IDREF1"}
+  content_opf.itemrefs << {:idref => "IDREF2"}
   puts(content_opf.to_s)
 end
