@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" version="2.0" unique-identifier="BookID">
+ <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
+  <dc:language>ja</dc:language>
+  <dc:identifier id="BookID" opf:scheme="UUID">urn:uuid:<%= h(@uuid) %></dc:identifier>
+  <dc:title><%= h(@title) %></dc:title>
+  <dc:creator opf:role="aut"><%= h(@author) %></dc:creator>
+  <%- if @publisher -%>
+  <dc:publisher><%= h(@publisher) %></dc:publisher>
+  <%- end -%>
+  <dc:date opf:event="publication"><%= Time.now.strftime("%Y-%m-%d") %></dc:date>
+ </metadata>
+ <manifest>
+  <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
+  <%- @items.each { |item| -%>
+  <item id="<%= h(item[:id]) %>" href="<%= h(item[:href]) %>" media-type="<%= h(item[:type]) %>"/>
+  <%- } -%>
+ </manifest>
+ <spine toc="ncx">
+  <%- @itemrefs.each { |itemref| -%>
+  <itemref idref="<%= h(itemref[:idref]) %>"/>
+  <%- } -%>
+ </spine>
+ <guide>
+  <reference type="toc" title="記事一覧" href="toc.xhtml"/>
+ </guide>
+</package>
