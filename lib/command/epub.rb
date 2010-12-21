@@ -8,6 +8,7 @@ require File.join(File.dirname(__FILE__), "..", "version")
 module Reink
   module Command
     module Epub
+      CommandName = File.basename(__FILE__, ".rb")
       LogLevels = [:off, :fatal, :error, :warn, :info, :debug].freeze
       DefaultOptions = {
         :manifest  => nil,
@@ -33,7 +34,7 @@ module Reink
       def self.parse_options(argv)
         options = DefaultOptions.dup
         OptionParser.new { |opt|
-          opt.program_name = "reink #{File.basename(__FILE__, '.rb')}"
+          opt.program_name = "reink #{CommandName}"
           opt.version      = Reink::VERSION
           opt.on("-m", "--manifest=FILE",       String)    { |v| options[:manifest]  = v }
           opt.on("-u", "--url-list=FILE",       String)    { |v| options[:url_list]  = v }
@@ -60,7 +61,7 @@ module Reink
       end
 
       def self.abort(exception)
-        STDERR.puts("reink #{File.basename(__FILE__, '.rb')}: #{exception.message}")
+        STDERR.puts("reink #{CommandName}: #{exception.message}")
         exit(1)
       end
     end
