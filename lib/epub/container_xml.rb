@@ -5,7 +5,6 @@ module Reink
     class ContainerXml
       def to_s
         return File.open(File.join(File.dirname(__FILE__), "container.xml"), "rb") { |file| file.read }
-        return DATA.read
       end
     end
   end
