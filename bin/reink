@@ -8,10 +8,14 @@ when "xhtml"
 when "dump"
   require(File.join(File.dirname(__FILE__), "..", "lib", "dump_command"))
   Reink::DumpCommand.main(ARGV)
+when "epub"
+  require(File.join(File.dirname(__FILE__), "..", "lib", "command", "epub"))
+  Reink::Command::Epub.main(ARGV)
 else
   STDERR.puts("Usage: reink COMMAND [options]")
   STDERR.puts("Commands:")
   STDERR.puts("  xhtml")
   STDERR.puts("  dump")
+  STDERR.puts("  epub")
   exit(1)
 end
