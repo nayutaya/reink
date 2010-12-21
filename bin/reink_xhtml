@@ -3,4 +3,4 @@
 
 require File.join(File.dirname(__FILE__), "..", "lib", "xhtml_command")
 
-Reink::XhtmlCommand.main(ARGV)
+Reink::Command::Xhtml.main(ARGV)

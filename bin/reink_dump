@@ -3,4 +3,4 @@
 
 require File.join(File.dirname(__FILE__), "..", "lib", "dump_command")
 
-Reink::DumpCommand.main(ARGV)
+Reink::Command::Dump.main(ARGV)
