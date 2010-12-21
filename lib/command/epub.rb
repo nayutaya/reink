@@ -25,6 +25,7 @@ module Reink
       def self.main(argv)
         options = self.parse_options(argv)
         p options
+        self.validate_options!(options)
       rescue RuntimeError => e
         self.abort(e)
       end
@@ -50,6 +51,12 @@ module Reink
         return options
       rescue OptionParser::ParseError => e
         self.abort(e)
+      end
+
+      def self.validate_options!(options)
+        raise("no such manifest file -- #{options[:manifest]}") if options[:manifest] && !File.exist?(options[:manifest])
+        # TODO: --url-listの存在確認
+        # TODO: --cache-dirの存在確認
       end
 
       def self.abort(exception)
