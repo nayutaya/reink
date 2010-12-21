@@ -1,6 +1,6 @@
 #! ruby -Ku
 # coding: utf-8
 
-require File.join(File.dirname(__FILE__), "..", "lib", "dump_command")
+require File.join(File.dirname(__FILE__), "..", "lib", "command", "dump")
 
 Reink::Command::Dump.main(ARGV)
