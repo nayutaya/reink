@@ -3,11 +3,11 @@
 
 case ARGV.shift
 when "xhtml"
-  require(File.join(File.dirname(__FILE__), "..", "lib", "xhtml_command"))
-  Reink::XhtmlCommand.main(ARGV)
+  require(File.join(File.dirname(__FILE__), "..", "lib", "command", "xhtml"))
+  Reink::Command::Xhtml.main(ARGV)
 when "dump"
-  require(File.join(File.dirname(__FILE__), "..", "lib", "dump_command"))
-  Reink::DumpCommand.main(ARGV)
+  require(File.join(File.dirname(__FILE__), "..", "lib", "command", "dump"))
+  Reink::Command::Dump.main(ARGV)
 when "epub"
   require(File.join(File.dirname(__FILE__), "..", "lib", "command", "epub"))
   Reink::Command::Epub.main(ARGV)
