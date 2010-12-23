@@ -5,6 +5,7 @@ require File.join(File.dirname(__FILE__), "container_xml")
 require File.join(File.dirname(__FILE__), "content_opf")
 require File.join(File.dirname(__FILE__), "toc_ncx")
 require File.join(File.dirname(__FILE__), "toc_xhtml")
+require File.join(File.dirname(__FILE__), "epub_zip")
 
 module Reink
   module Epub
@@ -78,6 +79,26 @@ module Reink
 
         return toc_xhtml
       end
+
+      def create_zip(meta, articles)
+        mimetype      = self.create_mimetype
+        container_xml = self.create_container_xml
+        content_opf   = self.create_content_opf(meta, articles)
+        toc_ncx       = self.create_toc_ncx(meta, articles)
+        toc_xhtml     = self.create_toc_xhtml(meta, articles)
+
+        zip = EpubZip.new
+        zip.add("mimetype",               mimetype.to_s)
+        zip.add("META-INF/container.xml", container_xml.to_s)
+        zip.add("OEBPS/content.opf",      content_opf.to_s)
+        zip.add("OEBPS/toc.ncx",          toc_ncx.to_s)
+        zip.add("OEBPS/toc.xhtml",        toc_xhtml.to_s)
+
+        # TODO: 記事本文の出力
+        # TODO: 記事イメージの出力
+
+        return zip
+      end
     end
   end
 end
@@ -117,15 +138,7 @@ if $0 == __FILE__
   ]
 
   factory       = Reink::Epub::EpubFactory.new
-  mimetype      = factory.create_mimetype
-  container_xml = factory.create_container_xml
-  content_opf   = factory.create_content_opf(meta, articles)
-  toc_ncx       = factory.create_toc_ncx(meta, articles)
-  toc_xhtml     = factory.create_toc_xhtml(meta, articles)
-
-  puts "---", mimetype
-  puts "---", container_xml
-  puts "---", content_opf
-  puts "---", toc_ncx
-  puts "---", toc_xhtml
+  zip = factory.create_zip(meta, articles)
+  zip.write("tmp.zip")
+  p zip
 end
