@@ -68,8 +68,14 @@ module Reink
 
       def create_toc_xhtml(meta, articles)
         toc_xhtml = TocXhtml.new
-        toc_xhtml.items << {:href => "HREF1", :title => "TITLE1"}
-        toc_xhtml.items << {:href => "HREF2", :title => "TITLE2"}
+
+        articles.each { |article|
+          toc_xhtml.items << {
+            :title => (article[:title]    || raise(ArgumentError, "article/title")),
+            :href  => (article[:filename] || raise(ArgumentError, "article/filename")),
+          }
+        }
+
         return toc_xhtml
       end
     end
@@ -117,9 +123,9 @@ if $0 == __FILE__
   toc_ncx       = factory.create_toc_ncx(meta, articles)
   toc_xhtml     = factory.create_toc_xhtml(meta, articles)
 
-  #puts "---", mimetype
-  #puts "---", container_xml
-  #puts "---", content_opf
+  puts "---", mimetype
+  puts "---", container_xml
+  puts "---", content_opf
   puts "---", toc_ncx
-  #puts "---", toc_xhtml
+  puts "---", toc_xhtml
 end
