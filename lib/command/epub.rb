@@ -18,6 +18,20 @@ module Reink
       LogLevels = [:off, :fatal, :error, :warn, :info, :debug].freeze
 
       def self.main(argv)
+        options  = self.get_options(argv)
+        logger   = self.create_logger(options[:log_level])
+        http     = self.create_http_client(logger, options[:interval])
+        meta     = self.create_meta(options)
+        urls     = self.get_urls(options)
+        articles = self.get_articles(http, urls)
+        self.write_epub(meta, articles, options[:output])
+        logger.info("wrote #{options[:output]}")
+      rescue RuntimeError, OptionParser::ParseError => e
+        STDERR.puts("reink #{CommandName}: #{exception.message}")
+        exit(1)
+      end
+
+      def self.get_options(argv)
         options = self.parse_options(argv)
         self.merge_manifest!(options)
         self.validate_options!(options)
@@ -26,21 +40,7 @@ module Reink
         options[:interval]  ||= 1.0
         options[:log_level] ||= :info
 
-        logger = self.create_logger(options[:log_level])
-        http   = self.create_http_client(logger, options[:interval])
-
-        meta     = self.create_meta(options)
-        urls     = self.get_urls(options)
-        articles = self.get_articles(http, urls)
-        self.write_epub(meta, articles, options[:output])
-        logger.info("wrote #{options[:output]}")
-      rescue RuntimeError, OptionParser::ParseError => e
-        self.abort(e)
-      end
-
-      def self.abort(exception)
-        STDERR.puts("reink #{CommandName}: #{exception.message}")
-        exit(1)
+        return options
       end
 
       def self.parse_options(argv)
