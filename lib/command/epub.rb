@@ -3,6 +3,7 @@
 require "optparse"
 require "rubygems"
 require "log4r"
+require "uuid"
 require File.join(File.dirname(__FILE__), "..", "version")
 require File.join(File.dirname(__FILE__), "..", "plugin")
 require File.join(File.dirname(__FILE__), "..", "http", "factory")
@@ -17,7 +18,7 @@ module Reink
       DefaultOptions = {
         :manifest  => nil,
         :url_list  => nil,
-        :output    => "output.zip",
+        :output    => "output.epub",
         :title     => nil,
         :author    => nil,
         :publisher => nil,
@@ -35,12 +36,8 @@ module Reink
         logger = self.create_logger(options[:log_level])
         http   = self.create_http_client(logger, options[:interval])
 
-        meta = {
-          :uuid      => "META-UUID",
-          :title     => "META-TITLE",
-          :author    => "META-AUTHOR",
-          :publisher => "META-PUBLISHER",
-        }
+        meta = self.create_meta(options)
+        p meta
 
         urls = self.get_urls(options)
         p urls
@@ -61,7 +58,8 @@ module Reink
 
         factory = Reink::Epub::EpubFactory.new
         zip = factory.create_zip(meta, articles)
-        zip.write("tmp.zip")
+        zip.write(options[:output])
+        logger.info("wrote #{options[:output]}")
       rescue RuntimeError, OptionParser::ParseError => e
         self.abort(e)
       end
@@ -135,6 +133,15 @@ module Reink
           :logger   => logger,
           :interval => interval,
           :store    => store)
+      end
+
+      def self.create_meta(options)
+        return {
+          :uuid      => (options[:uuid]      || UUID.new.generate),
+          :title     => (options[:title]     || Time.now.strftime("%Y-%m-%d %H:%M:%S")),
+          :author    => (options[:author]    || "Unknown"),
+          :publisher => (options[:publisher] || nil),
+        }
       end
     end
   end
