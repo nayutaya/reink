@@ -36,29 +36,10 @@ module Reink
         logger = self.create_logger(options[:log_level])
         http   = self.create_http_client(logger, options[:interval])
 
-        meta = self.create_meta(options)
-        p meta
-
-        urls = self.get_urls(options)
-        p urls
-        articles = urls.map { |url|
-          plugin    = Reink::Plugin.find_by_url(url) || raise("no such plugin for #{url}")
-          generator = plugin[:generator].call
-          generator.generate(http, url)
-        }
-
-        text_id  = 0
-        image_id = 0
-        articles.each { |article|
-          article[:id] = "t#{text_id += 1}"
-          (article[:images] || []).each { |image|
-            image[:id] = "i#{image_id += 1}"
-          }
-        }
-
-        factory = Reink::Epub::EpubFactory.new
-        zip = factory.create_zip(meta, articles)
-        zip.write(options[:output])
+        meta     = self.create_meta(options)
+        urls     = self.get_urls(options)
+        articles = self.get_articles(http, urls)
+        self.write_epub(meta, articles, options[:output])
         logger.info("wrote #{options[:output]}")
       rescue RuntimeError, OptionParser::ParseError => e
         self.abort(e)
@@ -100,16 +81,6 @@ module Reink
         # TODO: manifestファイルを読み込む
       end
 
-      def self.get_urls(options)
-        if options[:url_list]
-          return File.foreach(options[:url_list]).
-            map { |line| line.strip }.
-            reject { |line| line.empty? }
-        else
-          raise("missing urls")
-        end
-      end
-
       def self.create_logger(log_level)
         formatter = Log4r::PatternFormatter.new(:pattern => "%d [%l] %M", :date_pattern => "%H:%M:%S")
         outputter = Log4r::StderrOutputter.new("", :formatter => formatter)
@@ -142,6 +113,38 @@ module Reink
           :author    => (options[:author]    || "Unknown"),
           :publisher => (options[:publisher] || nil),
         }
+      end
+
+      def self.get_urls(options)
+        if options[:url_list]
+          return File.foreach(options[:url_list]).
+            map { |line| line.strip }.
+            reject { |line| line.empty? }
+        else
+          raise("missing urls")
+        end
+      end
+
+      def self.get_articles(http, urls)
+        text_id  = 0
+        image_id = 0
+
+        return urls.
+          map { |url| [url, Reink::Plugin.find_by_url(url) || raise("no such plugin for #{url}")] }.
+          map { |url, plugin| [url, plugin[:generator].call] }.
+          map { |url, generator| generator.generate(http, url) }.
+          each { |article|
+            article[:id] = "t#{text_id += 1}"
+            (article[:images] || []).each { |image|
+              image[:id] = "i#{image_id += 1}"
+            }
+          }
+      end
+
+      def self.write_epub(meta, articles, filename)
+        factory = Reink::Epub::EpubFactory.new
+        zip = factory.create_zip(meta, articles)
+        zip.write(filename)
       end
     end
   end
