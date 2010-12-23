@@ -73,8 +73,8 @@ module Reink
 
       def self.validate_options!(options)
         raise("no such manifest file -- #{options[:manifest]}") if options[:manifest] && !File.exist?(options[:manifest])
-        # TODO: --url-listの存在確認
-        # TODO: --cache-dirの存在確認
+        raise("no such url list file -- #{options[:url_list]}") if options[:url_list] && !File.exist?(options[:url_list])
+        raise("no such cache directory -- #{options[:cache_dir]}") if options[:cache_dir] && !File.directory?(options[:cache_dir])
       end
 
       def self.merge_manifest!(options)
