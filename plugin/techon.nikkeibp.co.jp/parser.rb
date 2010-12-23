@@ -70,7 +70,9 @@ module TechOn
       body.xpath('./div[@id="article-promo"]').remove
       # 本文内のp要素のテキストをクリーンアップ
       body.xpath('.//p/text()').each { |node|
-        text = node.text.strip.sub(/^　/, "")
+        text = node.text.strip
+        text.sub!(/^　/, "")
+        text.gsub!(/─/, "―") # U+2500 -> U+2015
         node.replace(Nokogiri::XML::Text.new(text, doc))
       }
       # 本文内の相対リンクをURLに置換
