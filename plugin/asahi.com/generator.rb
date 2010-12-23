@@ -41,9 +41,10 @@ module Asahi
     end
 
     def self.get_canonical_url(http, url)
-      src = http.get(url)
-      doc = Nokogiri.HTML(src)
-      return doc.xpath("/html/head/link[@rel='canonical']").first[:href]
+      src  = http.get(url)
+      doc  = Nokogiri.HTML(src)
+      link = doc.xpath("/html/head/link[@rel='canonical']").first
+      return (link ? link[:href] : url)
     end
 
     def self.get_multiple_page_urls(http, url)
