@@ -19,7 +19,6 @@ module Reink
 
       def self.main(argv)
         options = self.parse_options(argv)
-        self.validate_options!(options)
         self.merge_manifest!(options)
         self.validate_options!(options)
 
@@ -65,23 +64,30 @@ module Reink
         return options
       end
 
+      def self.merge_manifest!(options)
+        return unless options[:manifest]
+        manifest = YAML.load_file(options[:manifest])
+
+        m_url_list  = manifest.delete("url-list")
+        m_output    = manifest.delete("output")
+        m_title     = manifest.delete("title")
+        m_author    = manifest.delete("author")
+        m_publisher = manifest.delete("publisher")
+        m_uuid      = manifest.delete("uuid")
+        raise("unknown manifest keys -- #{manifest.keys.join(',')}") unless manifest.empty?
+
+        options[:url_list]  ||= m_url_list
+        options[:output]    ||= m_output
+        options[:title]     ||= m_title
+        options[:author]    ||= m_author
+        options[:publisher] ||= m_publisher
+        options[:uuid]      ||= m_uuid
+      end
+
       def self.validate_options!(options)
         raise("no such manifest file -- #{options[:manifest]}") if options[:manifest] && !File.exist?(options[:manifest])
         raise("no such url list file -- #{options[:url_list]}") if options[:url_list] && !File.exist?(options[:url_list])
         raise("no such cache directory -- #{options[:cache_dir]}") if options[:cache_dir] && !File.directory?(options[:cache_dir])
-      end
-
-      def self.merge_manifest!(options)
-        # TODO: manifestファイルを読み込む
-        return unless options[:manifest]
-        manifest = YAML.load_file(options[:manifest])
-
-        p m_url_list = manifest.delete("url-list")
-        p m_output   = manifest.delete("output")
-        raise("unknown manifest keys -- #{manifest.keys.join(',')}") unless manifest.empty?
-
-        options[:url_list] ||= m_url_list
-        options[:output]   ||= m_output
       end
 
       def self.create_logger(log_level)
