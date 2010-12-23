@@ -63,13 +63,13 @@ module Asahi
       body.remove_attribute("class")
       # 本文内のp要素のテキストをクリーンアップ
       body.xpath('.//p/text()').each { |node|
-        text = node.text.strip.sub(/^　/, "")
+        text = node.text.strip
+        text.sub!(/^　/, "")
+        text.gsub!(/◇/, "<>") # for Kindle 3
         node.replace(Nokogiri::XML::Text.new(text, doc))
       }
 
-      xml = body.to_xml(:indent => 0, :encoding => "UTF-8")
-
-      return xml
+      return body.to_xml(:indent => 0, :encoding => "UTF-8")
     end
   end
 end
