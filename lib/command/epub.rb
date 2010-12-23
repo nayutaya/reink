@@ -1,6 +1,7 @@
 # coding: utf-8
 
 require "optparse"
+require "yaml"
 require "rubygems"
 require "log4r"
 require "uuid"
@@ -15,23 +16,16 @@ module Reink
     module Epub
       CommandName = File.basename(__FILE__, ".rb")
       LogLevels = [:off, :fatal, :error, :warn, :info, :debug].freeze
-      DefaultOptions = {
-        :manifest  => nil,
-        :url_list  => nil,
-        :output    => "output.epub",
-        :title     => nil,
-        :author    => nil,
-        :publisher => nil,
-        :uuid      => nil,
-        :cache_dir => nil,
-        :interval  => 1.0,
-        :log_level => :info,
-      }.freeze
 
       def self.main(argv)
         options = self.parse_options(argv)
         self.validate_options!(options)
         self.merge_manifest!(options)
+        self.validate_options!(options)
+
+        options[:output]    ||= "output.epub"
+        options[:interval]  ||= 1.0
+        options[:log_level] ||= :info
 
         logger = self.create_logger(options[:log_level])
         http   = self.create_http_client(logger, options[:interval])
@@ -51,7 +45,7 @@ module Reink
       end
 
       def self.parse_options(argv)
-        options = DefaultOptions.dup
+        options = {}
         OptionParser.new { |opt|
           opt.program_name = "reink #{CommandName}"
           opt.version      = Reink::VERSION
@@ -79,6 +73,15 @@ module Reink
 
       def self.merge_manifest!(options)
         # TODO: manifestファイルを読み込む
+        return unless options[:manifest]
+        manifest = YAML.load_file(options[:manifest])
+
+        p m_url_list = manifest.delete("url-list")
+        p m_output   = manifest.delete("output")
+        raise("unknown manifest keys -- #{manifest.keys.join(',')}") unless manifest.empty?
+
+        options[:url_list] ||= m_url_list
+        options[:output]   ||= m_output
       end
 
       def self.create_logger(log_level)
