@@ -25,6 +25,17 @@ module Reink
         content_opf.author    = meta[:author]    || raise(ArgumentError, "author")
         content_opf.publisher = meta[:publisher] || nil
 
+        content_opf.items << {
+          :id   => "ncx",
+          :href => "toc.ncx",
+          :type => "application/x-dtbncx+xml",
+        }
+        content_opf.items << {
+          :id   => "toc",
+          :href => "toc.xhtml",
+          :type => "application/xhtml+xml",
+        }
+
         articles.each { |article|
           content_opf.items << {
             :id   => (article[:id]       || raise(ArgumentError, "article/id")),

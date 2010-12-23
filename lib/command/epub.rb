@@ -4,6 +4,10 @@ require "optparse"
 require "rubygems"
 require "log4r"
 require File.join(File.dirname(__FILE__), "..", "version")
+require File.join(File.dirname(__FILE__), "..", "plugin")
+require File.join(File.dirname(__FILE__), "..", "http", "factory")
+require File.join(File.dirname(__FILE__), "..", "http", "message_pack_store")
+require File.join(File.dirname(__FILE__), "..", "epub", "epub_factory")
 
 module Reink
   module Command
@@ -13,7 +17,7 @@ module Reink
       DefaultOptions = {
         :manifest  => nil,
         :url_list  => nil,
-        :output    => nil,
+        :output    => "output.zip",
         :title     => nil,
         :author    => nil,
         :publisher => nil,
@@ -25,10 +29,46 @@ module Reink
 
       def self.main(argv)
         options = self.parse_options(argv)
-        p options
         self.validate_options!(options)
-      rescue RuntimeError => e
+        self.merge_manifest!(options)
+
+        logger = self.create_logger(options[:log_level])
+        http   = self.create_http_client(logger, options[:interval])
+
+        meta = {
+          :uuid      => "META-UUID",
+          :title     => "META-TITLE",
+          :author    => "META-AUTHOR",
+          :publisher => "META-PUBLISHER",
+        }
+
+        urls = self.get_urls(options)
+        p urls
+        articles = urls.map { |url|
+          plugin    = Reink::Plugin.find_by_url(url) || raise("no such plugin for #{url}")
+          generator = plugin[:generator].call
+          generator.generate(http, url)
+        }
+
+        text_id  = 0
+        image_id = 0
+        articles.each { |article|
+          article[:id] = "t#{text_id += 1}"
+          (article[:images] || []).each { |image|
+            image[:id] = "i#{image_id += 1}"
+          }
+        }
+
+        factory = Reink::Epub::EpubFactory.new
+        zip = factory.create_zip(meta, articles)
+        zip.write("tmp.zip")
+      rescue RuntimeError, OptionParser::ParseError => e
         self.abort(e)
+      end
+
+      def self.abort(exception)
+        STDERR.puts("reink #{CommandName}: #{exception.message}")
+        exit(1)
       end
 
       def self.parse_options(argv)
@@ -50,8 +90,6 @@ module Reink
           opt.parse!(argv)
         }
         return options
-      rescue OptionParser::ParseError => e
-        self.abort(e)
       end
 
       def self.validate_options!(options)
@@ -60,9 +98,43 @@ module Reink
         # TODO: --cache-dirの存在確認
       end
 
-      def self.abort(exception)
-        STDERR.puts("reink #{CommandName}: #{exception.message}")
-        exit(1)
+      def self.merge_manifest!(options)
+        # TODO: manifestファイルを読み込む
+      end
+
+      def self.get_urls(options)
+        if options[:url_list]
+          return File.foreach(options[:url_list]).
+            map { |line| line.strip }.
+            reject { |line| line.empty? }
+        else
+          raise("missing urls")
+        end
+      end
+
+      def self.create_logger(log_level)
+        formatter = Log4r::PatternFormatter.new(:pattern => "%d [%l] %M", :date_pattern => "%H:%M:%S")
+        outputter = Log4r::StderrOutputter.new("", :formatter => formatter)
+        logger = Log4r::Logger.new($0)
+        logger.add(outputter)
+        logger.level =
+          case log_level
+          when :off   then Log4r::OFF
+          when :fatal then Log4r::FATAL
+          when :error then Log4r::ERROR
+          when :warn  then Log4r::WARN
+          when :info  then Log4r::INFO
+          when :debug then Log4r::DEBUG
+          end
+        return logger
+      end
+
+      def self.create_http_client(logger, interval)
+        store = HttpClient::MessagePackStore.new(File.join(File.dirname(__FILE__), "..", "..", "cache"))
+        return HttpClient::Factory.create_client(
+          :logger   => logger,
+          :interval => interval,
+          :store    => store)
       end
     end
   end
