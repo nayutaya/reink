@@ -1,8 +1,13 @@
 
 # TODO
 
-* reink_epubコマンドを追加
 * epub->azwのRakeルールを追加
+
+## reink epub
+
+* --cache-dir引数の処理を追加
+* デフォルトのキャッシュディレクトリをHOME以下に変更
+* キャッシュに失効を管理
 
 ## plugin: techon.nikkeibp.co.jp
 
