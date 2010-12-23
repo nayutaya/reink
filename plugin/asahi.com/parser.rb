@@ -24,7 +24,7 @@ module Asahi
     def self.extract_published_time(src)
       doc  = Nokogiri.HTML(src)
       time = doc.xpath('//*[@id="HeadLine"]/div[@class="Utility"]/p[1]/text()').text.strip
-      raise("invalid time") unless /\A(\d+)年(\d+)月(\d+)日(\d+)時(\d+)分\z/ =~ time
+      raise("invalid time") unless /\A(\d+)年(\d+)月(\d+)日(?:(\d+)時(\d+)分)?\z/ =~ time
       return Time.local($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i)
     end
 
@@ -67,7 +67,9 @@ module Asahi
         node.replace(Nokogiri::XML::Text.new(text, doc))
       }
 
-      return body.to_xml(:indent => 0, :encoding => "UTF-8")
+      xml = body.to_xml(:indent => 0, :encoding => "UTF-8")
+
+      return xml
     end
   end
 end
