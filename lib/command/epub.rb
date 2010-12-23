@@ -128,7 +128,8 @@ module Reink
         if options[:url_list]
           return File.foreach(options[:url_list]).
             map { |line| line.strip }.
-            reject { |line| line.empty? }
+            reject { |line| line.empty? }.
+            uniq
         else
           raise("missing urls")
         end
