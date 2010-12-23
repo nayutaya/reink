@@ -27,7 +27,7 @@ module Reink
         self.write_epub(meta, articles, options[:output])
         logger.info("wrote #{options[:output]}")
       rescue RuntimeError, OptionParser::ParseError => e
-        STDERR.puts("reink #{CommandName}: #{exception.message}")
+        STDERR.puts("reink #{CommandName}: #{e.message}")
         exit(1)
       end
 
