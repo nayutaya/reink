@@ -29,7 +29,7 @@ module Reink
           content_opf.items << {
             :id   => (article[:id]       || raise(ArgumentError, "article/id")),
             :href => (article[:filename] || raise(ArgumentError, "article/filename")),
-            :type => (article[:type]     || raise(ArgumentError, "article/type")),
+            :type => (article[:filetype] || raise(ArgumentError, "article/filetype")),
           }
 
           images = article[:images] || []
@@ -37,7 +37,7 @@ module Reink
             content_opf.items << {
               :id   => (image[:id]       || raise(ArgumentError, "article/image/id")),
               :href => (image[:filename] || raise(ArgumentError, "article/image/filename")),
-              :type => (image[:type]     || raise(ArgumentError, "article/image/type")),
+              :type => (image[:filetype] || raise(ArgumentError, "article/image/filetype")),
             }
           }
         }
@@ -94,8 +94,13 @@ module Reink
         zip.add("OEBPS/toc.ncx",          toc_ncx.to_s)
         zip.add("OEBPS/toc.xhtml",        toc_xhtml.to_s)
 
-        # TODO: 記事本文の出力
-        # TODO: 記事イメージの出力
+        articles.each { |article|
+          zip.add("OEBPS/" + article[:filename], article[:filebody])
+          images = article[:images] || []
+          images.each { |image|
+            zip.add("OEBPS/" + image[:filename], image[:filebody])
+          }
+        }
 
         return zip
       end
@@ -114,30 +119,34 @@ if $0 == __FILE__
     {
       :id       => "id1",
       :title    => "title1",
+      :filebody => "filebody1",
       :filename => "filename1",
-      :type     => "type1",
+      :filetype => "type1",
       :images   => [
         {
           :id       => "image-id1",
+          :filebody => "image-filebody1",
           :filename => "image-filename1",
-          :type     => "image-type1",
+          :filetype => "image-type1",
         },
         {
           :id       => "image-id2",
+          :filebody => "image-filebody2",
           :filename => "image-filename2",
-          :type     => "image-type2",
+          :filetype => "image-type2",
         },
       ],
     },
     {
       :id       => "id2",
       :title    => "title2",
+      :filebody => "filebody2",
       :filename => "filename2",
-      :type     => "type2",
+      :filetype => "type2",
     },
   ]
 
-  factory       = Reink::Epub::EpubFactory.new
+  factory = Reink::Epub::EpubFactory.new
   zip = factory.create_zip(meta, articles)
   zip.write("tmp.zip")
   p zip
