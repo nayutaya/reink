@@ -11,7 +11,6 @@
   <dc:date opf:event="publication"><%= Time.now.strftime("%Y-%m-%d") %></dc:date>
  </metadata>
  <manifest>
-  <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
   <%- @items.each { |item| -%>
   <item id="<%= h(item[:id]) %>" href="<%= h(item[:href]) %>" media-type="<%= h(item[:type]) %>"/>
   <%- } -%>
