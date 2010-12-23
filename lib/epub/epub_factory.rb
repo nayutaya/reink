@@ -32,9 +32,9 @@ module Reink
 
       def create_toc_ncx(meta, articles)
         toc_ncx = TocNcx.new
-        toc_ncx.uuid   = "UUID"
-        toc_ncx.title  = "TITLE"
-        toc_ncx.author = "AUTHOR"
+        toc_ncx.uuid   = meta[:uuid]   || raise(ArgumentError, "uuid")
+        toc_ncx.title  = meta[:title]  || raise(ArgumentError, "title")
+        toc_ncx.author = meta[:author] || raise(ArgumentError, "author")
         toc_ncx.nav_points << {:label_text => "LABEL-TEXT1", :content_src => "CONTENT-SRC1"}
         toc_ncx.nav_points << {:label_text => "LABEL-TEXT2", :content_src => "CONTENT-SRC2"}
         return toc_ncx
