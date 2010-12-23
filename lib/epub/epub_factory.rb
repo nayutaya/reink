@@ -55,8 +55,14 @@ module Reink
         toc_ncx.uuid   = meta[:uuid]   || raise(ArgumentError, "uuid")
         toc_ncx.title  = meta[:title]  || raise(ArgumentError, "title")
         toc_ncx.author = meta[:author] || raise(ArgumentError, "author")
-        toc_ncx.nav_points << {:label_text => "LABEL-TEXT1", :content_src => "CONTENT-SRC1"}
-        toc_ncx.nav_points << {:label_text => "LABEL-TEXT2", :content_src => "CONTENT-SRC2"}
+
+        articles.each { |article|
+          toc_ncx.nav_points << {
+            :label_text  => (article[:title]    || raise(ArgumentError, "article/title")),
+            :content_src => (article[:filename] || raise(ArgumentError, "article/filename")),
+          }
+        }
+
         return toc_ncx
       end
 
@@ -80,6 +86,7 @@ if $0 == __FILE__
   articles = [
     {
       :id       => "id1",
+      :title    => "title1",
       :filename => "filename1",
       :type     => "type1",
       :images   => [
@@ -97,6 +104,7 @@ if $0 == __FILE__
     },
     {
       :id       => "id2",
+      :title    => "title2",
       :filename => "filename2",
       :type     => "type2",
     },
@@ -111,7 +119,7 @@ if $0 == __FILE__
 
   #puts "---", mimetype
   #puts "---", container_xml
-  puts "---", content_opf
-  #puts "---", toc_ncx
+  #puts "---", content_opf
+  puts "---", toc_ncx
   #puts "---", toc_xhtml
 end
