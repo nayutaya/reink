@@ -72,7 +72,11 @@ module TechOn
       body.xpath('.//p/text()').each { |node|
         text = node.text.strip
         text.sub!(/^　/, "")
+        # for Kindle 3
+        text.gsub!(/◇/, "<>") # U+25C7 -> ASCII
         text.gsub!(/─/, "―") # U+2500 -> U+2015
+        text.gsub!(/━/, "―") # U+2501 -> U+2015
+        text.gsub!(/～/, "〜") # U+FF5E -> U+301C
         node.replace(Nokogiri::XML::Text.new(text, doc))
       }
       # 本文内の相対リンクをURLに置換
