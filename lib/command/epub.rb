@@ -143,6 +143,7 @@ module Reink
           map { |url| [url, Reink::Plugin.find_by_url(url) || raise("no such plugin for #{url}")] }.
           map { |url, plugin| [url, plugin[:generator].call] }.
           map { |url, generator| generator.generate(http, url) }.
+          sort_by { |article| article[:published_time] }.
           each { |article|
             article[:id] = "t#{text_id += 1}"
             (article[:images] || []).each { |image|
