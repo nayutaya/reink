@@ -53,6 +53,10 @@ module Reink
           }
         }
 
+        content_opf.itemrefs << {
+          :idref => "toc",
+        }
+
         articles.each { |article|
           content_opf.itemrefs << {
             :idref => (article[:id] || raise(ArgumentError, "article/id")),
