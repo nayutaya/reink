@@ -23,10 +23,30 @@ module Reink
         content_opf.title     = meta[:title]     || raise(ArgumentError, "title")
         content_opf.author    = meta[:author]    || raise(ArgumentError, "author")
         content_opf.publisher = meta[:publisher] || nil
-        content_opf.items    << {:id => "ID1", :href => "HREF1", :type => "TYPE1"}
-        content_opf.items    << {:id => "ID2", :href => "HREF2", :type => "TYPE2"}
-        content_opf.itemrefs << {:idref => "IDREF1"}
-        content_opf.itemrefs << {:idref => "IDREF2"}
+
+        articles.each { |article|
+          content_opf.items << {
+            :id   => (article[:id]       || raise(ArgumentError, "article/id")),
+            :href => (article[:filename] || raise(ArgumentError, "article/filename")),
+            :type => (article[:type]     || raise(ArgumentError, "article/type")),
+          }
+
+          images = article[:images] || []
+          images.each { |image|
+            content_opf.items << {
+              :id   => (image[:id]       || raise(ArgumentError, "article/image/id")),
+              :href => (image[:filename] || raise(ArgumentError, "article/image/filename")),
+              :type => (image[:type]     || raise(ArgumentError, "article/image/type")),
+            }
+          }
+        }
+
+        articles.each { |article|
+          content_opf.itemrefs << {
+            :idref => (article[:id] || raise(ArgumentError, "article/id")),
+          }
+        }
+
         return content_opf
       end
 
@@ -57,7 +77,30 @@ if $0 == __FILE__
     :author    => "META-AUTHOR",
     :publisher => "META-PUBLISHER",
   }
-  articles = []
+  articles = [
+    {
+      :id       => "id1",
+      :filename => "filename1",
+      :type     => "type1",
+      :images   => [
+        {
+          :id       => "image-id1",
+          :filename => "image-filename1",
+          :type     => "image-type1",
+        },
+        {
+          :id       => "image-id2",
+          :filename => "image-filename2",
+          :type     => "image-type2",
+        },
+      ],
+    },
+    {
+      :id       => "id2",
+      :filename => "filename2",
+      :type     => "type2",
+    },
+  ]
 
   factory       = Reink::Epub::EpubFactory.new
   mimetype      = factory.create_mimetype
@@ -69,6 +112,6 @@ if $0 == __FILE__
   #puts "---", mimetype
   #puts "---", container_xml
   puts "---", content_opf
-  puts "---", toc_ncx
-  puts "---", toc_xhtml
+  #puts "---", toc_ncx
+  #puts "---", toc_xhtml
 end
