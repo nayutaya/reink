@@ -33,13 +33,13 @@ module Asahi
       images = []
       images += doc.xpath('//*[@id="HeadLine"]//table[@class="ThmbColTb"]//p').map { |parag|
         img     = parag.xpath('.//img').first || next
-        url     = URI.join(url, img[:src]).to_s
+        url     = URI.join(url, img[:src].strip).to_s
         caption = parag.xpath('./small/text()').text.strip
         {:url => url, :caption => caption}
       }.compact
       images += doc.xpath('//*[@id="HeadLine"]//div[@class="ThmbCol"]//p').map { |parag|
         img     = parag.xpath('.//img').first || next
-        url     = URI.join(url, img[:src]).to_s
+        url     = URI.join(url, img[:src].strip).to_s
         caption = parag.xpath('./small/text()').text.strip
         {:url => url, :caption => caption}
       }.compact
