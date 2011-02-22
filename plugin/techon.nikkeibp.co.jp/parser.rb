@@ -6,7 +6,7 @@ require "nokogiri"
 
 module TechOn
   module Parser
-    def self.extract(src, url)
+    def self.parse(src, url)
       return {
         :url            => url,
         :title          => self.extract_title(src),

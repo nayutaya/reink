@@ -6,11 +6,19 @@ require File.join(File.dirname(__FILE__), "formatter")
 
 module TechOn
   module Generator
-    def self.generate(http, url)
-      curl    = self.get_canonical_url(http, url)
-      src     = http.get(curl)
-      article = Parser.extract(src, curl)
+    def self.generate(http, original_url)
+      canonical_url = self.get_canonical_url(http, original_url)
+      urls          = self.get_multiple_page_urls(http, canonical_url)
 
+      articles = urls.map { |url, src|
+        Parser.parse(http.get(url), url)
+      }
+
+      (articles[1..-1] || []).each { |article|
+        articles[0][:body] << "<hr/>" << article[:body]
+      }
+
+      article = articles.first
       article[:images].each { |image|
         image_url = image[:url]
         ext, type =
