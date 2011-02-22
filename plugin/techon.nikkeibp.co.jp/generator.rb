@@ -71,5 +71,7 @@ if $0 == __FILE__
 
   p url1 = "http://techon.nikkeibp.co.jp/article/NEWS/20110218/189699/?ref=rss"
   p url2 = TechOn::Generator.get_canonical_url(http, url1)
-  pp TechOn::Generator.get_multiple_page_urls(http, url2)
+  #pp TechOn::Generator.get_multiple_page_urls(http, url2)
+  src = http.get(url2)
+  pp internal_images = TechOn::Parser.extract_internal_images(src, url2)
 end

@@ -50,6 +50,17 @@ module TechOn
       }
     end
 
+    def self.extract_internal_images(src, url)
+      doc  = Nokogiri.HTML(src)
+      divs = doc.xpath('//div[@id="kiji"]//div[@class="bpimage_center"]')
+      return divs.map { |div|
+        path    = div.xpath('./div[@class="bpimage_image"]//img').first[:src]
+        url     = URI.join(url, path).to_s
+        caption = div.xpath('./div[@class="bpimage_title"]//text()').text.strip
+        {:url => url, :caption => caption}
+      }
+    end
+
     def self.extract_body(src, url)
       doc = Nokogiri.HTML(src)
 
