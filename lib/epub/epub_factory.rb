@@ -43,7 +43,9 @@ module Reink
             :type => (article[:filetype] || raise(ArgumentError, "article/filetype")),
           }
 
-          images = article[:images] || []
+          images  = []
+          images += article[:images]          || []
+          images += article[:internal_images] || []
           images.each { |image|
             content_opf.items << {
               :id   => (image[:id]       || raise(ArgumentError, "article/image/id")),
@@ -111,7 +113,9 @@ module Reink
 
         articles.each { |article|
           zip.add("OEBPS/" + article[:filename], article[:filebody])
-          images = article[:images] || []
+          images  = []
+          images += article[:images]          || []
+          images += article[:internal_images] || []
           images.each { |image|
             zip.add("OEBPS/" + image[:filename], image[:filebody])
           }

@@ -149,6 +149,9 @@ module Reink
             (article[:images] || []).each { |image|
               image[:id] = "i#{image_id += 1}"
             }
+            (article[:internal_images] || []).each { |image|
+              image[:id] = "i#{image_id += 1}"
+            }
           }
       end
 
