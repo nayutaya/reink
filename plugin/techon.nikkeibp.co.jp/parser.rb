@@ -8,12 +8,13 @@ module TechOn
   module Parser
     def self.parse(src, url)
       return {
-        :url            => url,
-        :title          => self.extract_title(src),
-        :published_time => self.extract_published_time(src),
-        :author         => self.extract_author(src),
-        :images         => self.extract_images(src, url),
-        :body           => self.extract_body(src, url),
+        :url             => url,
+        :title           => self.extract_title(src),
+        :published_time  => self.extract_published_time(src),
+        :author          => self.extract_author(src),
+        :images          => self.extract_images(src, url),
+        :internal_images => self.extract_internal_images(src, url),
+        :body            => self.extract_body(src, url),
       }
     end
 
@@ -93,8 +94,14 @@ module TechOn
       # 本文内の相対リンクをURLに置換
       body.xpath('.//a').each { |anchor|
         path = anchor[:href].strip
-        url  = URI.join(url, path).to_s
-        anchor.set_attribute("href", url)
+        anchor.set_attribute("href", URI.join(url, path).to_s)
+      }
+      # 本文内の画像パスをURLに置換
+      body.xpath('.//div[@class="bpimage_image"]//img').each { |img|
+        path = img[:src].strip
+        img.set_attribute("src", URI.join(url, path).to_s)
+        img.remove_attribute("width")
+        img.remove_attribute("height")
       }
 
       return body.to_xml(:indent => 0, :encoding => "UTF-8")
