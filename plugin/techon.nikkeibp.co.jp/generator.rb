@@ -35,8 +35,33 @@ module TechOn
       return url
     end
 
+    def self.get_multiple_page_urls(http, url)
+      src = http.get(url)
+      doc = Nokogiri.HTML(src)
+
+      urls  = [url]
+      urls += doc.xpath('//*[@id="pageNumber"]//a').
+        map { |anchor| anchor[:href] }.
+        map { |path| URI.join(url, path).to_s }
+
+      return urls.uniq
+    end
+
     def self.create_filename(url, ext)
       return "techon_#{Digest::SHA1.hexdigest(url)[0, 20]}.#{ext}"
     end
   end
+end
+
+if $0 == __FILE__
+  require "open-uri"
+  require "pp"
+  http = Object.new
+  def http.get(url)
+    return open(url) { |io| io.read }
+  end
+
+  p url1 = "http://techon.nikkeibp.co.jp/article/NEWS/20110218/189699/?ref=rss"
+  p url2 = TechOn::Generator.get_canonical_url(http, url1)
+  pp TechOn::Generator.get_multiple_page_urls(http, url2)
 end
