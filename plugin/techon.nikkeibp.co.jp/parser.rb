@@ -53,7 +53,7 @@ module TechOn
 
     def self.extract_internal_images(src, url)
       doc  = Nokogiri.HTML(src)
-      divs = doc.xpath('//div[@id="kiji"]//div[@class="bpimage_center"]')
+      divs = doc.xpath('//div[@id="kiji"]//div[@class="bpimage_center" or @class="bpimage_right"]')
       return divs.map { |div|
         path    = div.xpath('./div[@class="bpimage_image"]//img').first[:src]
         url     = URI.join(url, path).to_s
