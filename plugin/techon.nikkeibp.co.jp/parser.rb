@@ -99,7 +99,8 @@ module TechOn
       # 本文内の画像パスをURLに置換
       body.xpath('.//div[@class="bpimage_image"]//img').each { |img|
         path = img[:src].strip
-        img.set_attribute("src", URI.join(url, path).to_s)
+        # FIXME: Generatorに依存しないように修正する
+        img.set_attribute("src", Generator.create_filename(URI.join(url, path).to_s, "jpg"))
         img.remove_attribute("width")
         img.remove_attribute("height")
       }

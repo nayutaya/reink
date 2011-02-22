@@ -14,12 +14,23 @@ module TechOn
         Parser.parse(http.get(url), url)
       }
 
+      articles[0][:images]          ||= []
+      articles[0][:internal_images] ||= []
+
       (articles[1..-1] || []).each { |article|
         articles[0][:body] << "<hr/>" << article[:body]
+        articles[0][:images]          += article[:images]          || []
+        articles[0][:internal_images] += article[:internal_images] || []
       }
 
-      article = articles.first
-      article[:images].each { |image|
+      articles[0][:images].uniq!
+      articles[0][:internal_images].uniq!
+
+      images = []
+      images += articles[0][:images]
+      images += articles[0][:internal_images]
+
+      images.each { |image|
         image_url = image[:url]
         ext, type =
           case image_url
@@ -31,6 +42,15 @@ module TechOn
         image[:filetype] = type
       }
 
+=begin
+      images.each { |image|
+        body.xpath("//img").
+          select { |img| img[:src] == image[:url] }.
+          each   { |img| img.set_attribute("src", image[:filename]) }
+      }
+=end
+
+      article = articles.first
       article[:filebody] = Formatter.format(article)
       article[:filename] = self.create_filename(article[:url], "xhtml")
       article[:filetype] = "application/xhtml+xml"

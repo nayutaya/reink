@@ -100,7 +100,10 @@ module Reink
       end
 
       def self.write_images(logger, article, output_dir)
-        article[:images].each { |image|
+        images  = []
+        images += article[:images]
+        images += article[:internal_images] || []
+        images.each { |image|
           filename = File.join(output_dir, image[:filename])
           File.open(filename, "wb") { |file|
             file.write(image[:filebody])
