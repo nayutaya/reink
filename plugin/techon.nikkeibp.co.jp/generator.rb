@@ -35,7 +35,8 @@ module TechOn
         ext, type =
           case image_url
           when /\.jpg$/i then ["jpg", "image/jpeg"]
-          else raise("unknown type")
+          when /\.gif$/i then ["gif", "image/gif"]
+          else raise("unknown type -- #{image_url}")
           end
         image[:filebody] = http.get(image_url)
         image[:filename] = self.create_filename(image_url, ext)
