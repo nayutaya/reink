@@ -6,6 +6,9 @@ require "nokogiri"
 
 module Asahi
   module Parser
+    class ParseError < StandardError
+    end
+
     def self.parse(src, url)
       return {
         :url            => url,
@@ -22,9 +25,22 @@ module Asahi
     end
 
     def self.extract_published_time(src)
+      return self.extract_published_time1(src)
+    rescue ParseError
+      return self.extract_published_time2(src)
+    end
+
+    def self.extract_published_time1(src)
       doc  = Nokogiri.HTML(src)
       time = doc.xpath('//*[@id="HeadLine"]/div[@class="Utility"]/p[1]/text()').text.strip
-      raise("invalid time") unless /\A(\d+)年(\d+)月(\d+)日(?:(\d+)時(\d+)分)?\z/ =~ time
+      raise(ParseError, "invalid time") unless /\A(\d+)年(\d+)月(\d+)日(?:(\d+)時(\d+)分)?\z/ =~ time
+      return Time.local($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i)
+    end
+
+    def self.extract_published_time2(src)
+      doc  = Nokogiri.HTML(src)
+      time = doc.xpath('//dl[@id="TopicPath"]/dd[@class="FloatR"]/text()').text.strip
+      raise(ParseError, "invalid time") unless /\A(\d+)年(\d+)月(\d+)日(?:(\d+)時(\d+)分)?\z/ =~ time
       return Time.local($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i)
     end
 
