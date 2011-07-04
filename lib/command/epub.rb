@@ -127,8 +127,9 @@ module Reink
       def self.get_urls(options)
         if options[:url_list]
           return File.foreach(options[:url_list]).
-            map { |line| line.strip }.
+            map    { |line| line.strip }.
             reject { |line| line.empty? }.
+            reject { |line| /^#/ =~ line }.
             uniq
         else
           raise("missing urls")
