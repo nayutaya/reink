@@ -3,17 +3,18 @@ var popup = {};
 
 popup.onLoad = function() {
   chrome.windows.getCurrent(function(currentWindow) {
-    currentWindowId = currentWindow.id;
-    //alert("currentWindowId: " + currentWindowId);
-    chrome.tabs.getAllInWindow(currentWindowId, function(tabs) {
-      //alert("tabs: " + tabs);
-       //document.getElementById("urls")
+    chrome.tabs.getAllInWindow(currentWindow.id, function(tabs) {
       var urls = "";
       for ( var i = 0, len = tabs.length; i < len; i++ )
       {
+        urls += "# " + tabs[i].title + "\n";
         urls += tabs[i].url + "\n";
       }
-      alert(urls);
+
+      var textarea = document.getElementById("urls");
+      textarea.value = urls;
+      textarea.focus();
+      textarea.select();
     });
   });
 };
