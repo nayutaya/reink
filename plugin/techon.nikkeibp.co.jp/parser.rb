@@ -55,7 +55,7 @@ module TechOn
       doc  = Nokogiri.HTML(src)
       divs = doc.xpath('//div[@id="kiji"]//div[@class="bpimage_set" or @class="bpimage_center" or @class="bpimage_right"]')
       return divs.map { |div|
-        path    = div.xpath('./div[@class="bpimage_image"]//img').first[:src]
+        path    = div.xpath('./div[@class="bpimage_image"]//img').first[:src].strip
         url     = URI.join(url, path).to_s
         caption = div.xpath('./div[@class="bpimage_title"]//text()').text.strip
         {:url => url, :caption => caption}
