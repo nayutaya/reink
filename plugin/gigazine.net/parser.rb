@@ -23,7 +23,7 @@ module Gigazine
 
     def self.extract_title(src)
       doc = Nokogiri.HTML(src)
-      return doc.xpath('//*[@id="maincol"]/div/h1[1]/text()').text.strip
+      return doc.xpath('//*[@id="maincol"]/div[@class="content"]/h1[@class="title"]/text()').text.strip
     end
 
     def self.extract_published_time(src)
