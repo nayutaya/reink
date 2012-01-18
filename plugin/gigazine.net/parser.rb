@@ -9,7 +9,6 @@ module Gigazine
     class ParseError < StandardError
     end
 
-=begin
     def self.parse(src, url)
       return {
         :url            => url,
@@ -19,7 +18,6 @@ module Gigazine
         :body           => self.extract_body(src),
       }
     end
-=end
 
     def self.extract_title(src)
       doc = Nokogiri.HTML(src)
@@ -33,25 +31,9 @@ module Gigazine
       return Time.local($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i)
     end
 
-=begin
     def self.extract_images(src, url)
-      doc = Nokogiri.HTML(src)
-      images = []
-      images += doc.xpath('//*[@id="HeadLine"]//table[@class="ThmbColTb"]//p').map { |parag|
-        img     = parag.xpath('.//img').first || next
-        url     = URI.join(url, img[:src].strip).to_s
-        caption = parag.xpath('./small/text()').text.strip
-        {:url => url, :caption => caption}
-      }.compact
-      images += doc.xpath('//*[@id="HeadLine"]//div[@class="ThmbCol"]//p').map { |parag|
-        img     = parag.xpath('.//img').first || next
-        url     = URI.join(url, img[:src].strip).to_s
-        caption = parag.xpath('./small/text()').text.strip
-        {:url => url, :caption => caption}
-      }.compact
-      return images
+      return []
     end
-=end
 
     def self.extract_body(src)
       doc = Nokogiri.HTML(src)
