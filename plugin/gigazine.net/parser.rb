@@ -51,6 +51,7 @@ module Gigazine
       }.compact
       return images
     end
+=end
 
     def self.extract_body(src)
       doc = Nokogiri.HTML(src)
@@ -64,7 +65,13 @@ module Gigazine
         each   { |node| node.remove }
 
       # 本文のdiv要素を取得
-      body = doc.xpath('//*[@id="HeadLine"]//div[@class="BodyTxt"]').first
+      body = doc.xpath('//*[@id="maincol"]/div[@class="content"]/p[@class="preface"]').first
+
+      # a要素のtarget要素を削除
+      body.xpath('.//a').each { |node| node.remove_attribute("target") }
+      # img要素のborder属性を削除
+      body.xpath('.//img').each { |node| node.remove_attribute("border") }
+
       # 本文の不要なclass属性を削除
       body.remove_attribute("class")
       # 本文内のp要素のテキストをクリーンアップ
@@ -79,8 +86,7 @@ module Gigazine
         node.replace(Nokogiri::XML::Text.new(text, doc))
       }
 
-      return body.to_xml(:indent => 0, :encoding => "UTF-8")
+      return body.to_xml(:indent => 1, :encoding => "UTF-8")
     end
-=end
   end
 end
