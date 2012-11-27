@@ -10,13 +10,14 @@ module HttpClient
 end
 
 class HttpClient::BasicClient
-  def initialize(logger)
+  def initialize(logger, header)
     @logger = logger
+    @header = header
   end
 
   def get(url)
     @logger.info("get [#{url}]")
     # FIXME: net/httpを使う
-    return open(url) { |io| io.read }
+    return open(url, @header) { |io| io.read }
   end
 end

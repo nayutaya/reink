@@ -17,9 +17,10 @@ module Reink
         output_dir = options[:output_dir]
         interval   = options[:interval]
         log_level  = options[:log_level]
+        cookie     = options[:cookie]
 
         logger = self.create_logger(log_level)
-        http   = self.create_http_client(logger, interval)
+        http   = self.create_http_client(logger, interval, cookie)
 
         plugin    = Reink::Plugin.find_by_url(url) || raise("no such plugin for #{url}")
         generator = plugin[:generator].call
@@ -37,6 +38,7 @@ module Reink
           :output_dir => ".",
           :interval   => 1.0,
           :log_level  => :info,
+          :cookie     => nil,
         }
 
         log_levels = [:off, :fatal, :error, :warn, :info, :debug]
@@ -47,6 +49,7 @@ module Reink
           # TODO: -c --cache-dir=DIR を追加
           opt.on("-i", "--interval=SECOND", Float)      { |v| options[:interval]   = v }
           opt.on("-l", "--log-level=LEVEL", log_levels) { |v| options[:log_level]  = v }
+          opt.on("-c", "--cookie=COOKIE", String)       { |v| options[:cookie]     = v }
           opt.on("-v", "--verbose")                     { |v| options[:log_level]  = :debug }
           opt.parse!(argv)
         }
@@ -83,9 +86,13 @@ module Reink
         return logger
       end
 
-      def self.create_http_client(logger, interval)
+      def self.create_http_client(logger, interval, cookie)
+        header = {}
+        header["Cookie"] = cookie if cookie
+
         store = HttpClient::MessagePackStore.new(File.join(File.dirname(__FILE__), "..", "..", "cache"))
         return HttpClient::Factory.create_client(
+          :header   => header,
           :logger   => logger,
           :interval => interval,
           :store    => store)

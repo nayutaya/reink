@@ -11,12 +11,13 @@ module HttpClient
   module Factory
     def self.create_client(options)
       options = options.dup
+      header   = options.delete(:header)   || {}
       logger   = options.delete(:logger)   || raise(ArgumentError, "logger")
       interval = options.delete(:interval) || nil
       store    = options.delete(:store)    || nil
       raise(ArgumentError, "invalid key -- " + options.keys.join(",")) unless options.empty?
 
-      client = HttpClient::BasicClient.new(logger)
+      client = HttpClient::BasicClient.new(logger, header)
       client = HttpClient::IntervalClient.new(logger, client, interval) if interval
       client = HttpClient::CachedClient.new(logger, client, store) if store
 
