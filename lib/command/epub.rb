@@ -20,7 +20,7 @@ module Reink
       def self.main(argv)
         options  = self.get_options(argv)
         logger   = self.create_logger(options[:log_level])
-        http     = self.create_http_client(logger, options[:interval])
+        http     = self.create_http_client(logger, options[:interval], options[:cookie])
         meta     = self.create_meta(options)
         urls     = self.get_urls(options)
         articles = self.get_articles(http, urls)
@@ -58,6 +58,7 @@ module Reink
           opt.on("-c", "--cache-dir=DIRECTORY", String)    { |v| options[:cache_dir] = v }
           opt.on("-i", "--interval=SECOND",     Float)     { |v| options[:interval]  = v }
           opt.on("-l", "--log-level=LEVEL",     LogLevels) { |v| options[:log_level] = v }
+          opt.on("-c", "--cookie=COOKIE",       String)    { |v| options[:cookie]    = v }
           opt.on("-v", "--verbose")                        { |v| options[:log_level] = :debug }
           opt.parse!(argv)
         }
@@ -107,9 +108,13 @@ module Reink
         return logger
       end
 
-      def self.create_http_client(logger, interval)
+      def self.create_http_client(logger, interval, cookie)
+        header = {}
+        header["Cookie"] = cookie if cookie
+
         store = HttpClient::MessagePackStore.new(File.join(File.dirname(__FILE__), "..", "..", "cache"))
         return HttpClient::Factory.create_client(
+          :header   => header,
           :logger   => logger,
           :interval => interval,
           :store    => store)
