@@ -75,6 +75,7 @@ module Reink
         m_author    = manifest.delete("author")
         m_publisher = manifest.delete("publisher")
         m_uuid      = manifest.delete("uuid")
+        m_cookie    = manifest.delete("cookie")
         raise("unknown manifest keys -- #{manifest.keys.join(',')}") unless manifest.empty?
 
         options[:url_list]  ||= m_url_list
@@ -83,6 +84,7 @@ module Reink
         options[:author]    ||= m_author
         options[:publisher] ||= m_publisher
         options[:uuid]      ||= m_uuid
+        options[:cookie]    ||= m_cookie
       end
 
       def self.validate_options!(options)
