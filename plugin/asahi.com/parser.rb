@@ -61,7 +61,7 @@ module Asahi
         each   { |node| node.remove }
 
       # 本文のdiv要素を取得
-      body = doc.xpath('//*[@id="HeadLine"]//div[@class="BodyTxt"]').first
+      body = doc.xpath('//div[@id="HeadLine"]//div[@class="BodyTxt"]').first
       # 本文の不要なclass属性を削除
       body.remove_attribute("class")
       # 本文内のp要素のテキストをクリーンアップ
