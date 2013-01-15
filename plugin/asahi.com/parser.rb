@@ -21,7 +21,7 @@ module Asahi
 
     def self.extract_title(src)
       doc = Nokogiri.HTML(src)
-      return doc.xpath('//*[@id="HeadLine"]//h1[1]/text()').text.strip
+      return doc.xpath('//div[@id="HeadLine"]//h1[1]/text()').text.strip
     end
 
     def self.extract_published_time(src)
