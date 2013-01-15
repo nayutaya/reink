@@ -21,25 +21,12 @@ module Asahi
 
     def self.extract_title(src)
       doc = Nokogiri.HTML(src)
-      return doc.xpath('//*[@id="HeadLine"]/h1[1]/text()').text.strip
+      return doc.xpath('//div[@id="HeadLine"]//h1[1]/text()').text.strip
     end
 
     def self.extract_published_time(src)
-      return self.extract_published_time1(src)
-    rescue ParseError
-      return self.extract_published_time2(src)
-    end
-
-    def self.extract_published_time1(src)
       doc  = Nokogiri.HTML(src)
-      time = doc.xpath('//*[@id="HeadLine"]/div[@class="Utility"]/p[1]/text()').text.strip
-      raise(ParseError, "invalid time") unless /\A(\d+)年(\d+)月(\d+)日(?:(\d+)時(\d+)分)?\z/ =~ time
-      return Time.local($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i)
-    end
-
-    def self.extract_published_time2(src)
-      doc  = Nokogiri.HTML(src)
-      time = doc.xpath('//dl[@id="TopicPath"]/dd[@class="FloatR"]/text()').text.strip
+      time = doc.xpath('//div[@id="Main"]//p[@class="LastUpdated"]/text()').text.strip
       raise(ParseError, "invalid time") unless /\A(\d+)年(\d+)月(\d+)日(?:(\d+)時(\d+)分)?\z/ =~ time
       return Time.local($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i)
     end
@@ -47,18 +34,16 @@ module Asahi
     def self.extract_images(src, url)
       doc = Nokogiri.HTML(src)
       images = []
-      images += doc.xpath('//*[@id="HeadLine"]//table[@class="ThmbColTb"]//p').map { |parag|
+      images += doc.xpath('//div[@id="MainInner"]//table[@class="ThmbColTb"]//p').map { |parag|
         img     = parag.xpath('.//img').first || next
         url     = URI.join(url, img[:src].strip).to_s
         caption = parag.xpath('./small/text()').text.strip
         {:url => url, :caption => caption}
       }.compact
-      images += doc.xpath('//*[@id="HeadLine"]//div[@class="ThmbCol"]//p').map { |parag|
-        img     = parag.xpath('.//img').first || next
-        url     = URI.join(url, img[:src].strip).to_s
-        caption = parag.xpath('./small/text()').text.strip
-        {:url => url, :caption => caption}
-      }.compact
+      # MEMO: 画像が大きすぎるため、コメントアウト
+      #images.each { |image|
+      #  image[:url].sub!(/\/images\/t_(.+)\.jpg$/) { "/images/#{$1}.jpg" }
+      #}
       return images
     end
 
@@ -74,7 +59,7 @@ module Asahi
         each   { |node| node.remove }
 
       # 本文のdiv要素を取得
-      body = doc.xpath('//*[@id="HeadLine"]//div[@class="BodyTxt"]').first
+      body = doc.xpath('//div[@id="MainInner"]//div[@class="BodyTxt"]').first
       # 本文の不要なclass属性を削除
       body.remove_attribute("class")
       # 本文内のp要素のテキストをクリーンアップ
