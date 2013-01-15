@@ -40,6 +40,9 @@ module Asahi
         caption = parag.xpath('./small/text()').text.strip
         {:url => url, :caption => caption}
       }.compact
+      images.each { |image|
+        image[:url].sub!(/\/images\/t_(.+)\.jpg$/) { "/images/#{$1}.jpg" }
+      }
       return images
     end
 
