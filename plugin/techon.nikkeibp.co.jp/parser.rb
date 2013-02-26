@@ -21,6 +21,8 @@ module TechOn
     def self.extract_title(src)
       doc   = Nokogiri.HTML(src)
       title = doc.xpath('//*[@id="kijiBox"]/h1/text()').text.strip
+      title = doc.xpath('//*[@id="article"]//h1/text()').text.strip if title.empty?
+      raise "extract_title" if title.empty?
       return title
     end
 
@@ -29,9 +31,14 @@ module TechOn
       time = doc.xpath('//*[@id="kijiBox"]/div[@class="topTitleMenu"]/div[@class="date"]/text()').text.strip
       if /\A(\d\d\d\d)\/(\d\d)\/(\d\d) (\d\d):(\d\d)\z/ =~ time
         return Time.local($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i)
-      else
-        return nil
       end
+
+      time = doc.xpath('//div[@id="article"]//div[@class="date"]/text()').text.strip
+      if /\A(\d\d\d\d)\/(\d\d)\/(\d\d) (\d\d):(\d\d)\z/ =~ time
+        return Time.local($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i)
+      end
+
+      raise "extract_published_time"
     end
 
     def self.extract_author(src)
