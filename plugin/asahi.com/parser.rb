@@ -21,7 +21,7 @@ module Asahi
 
     def self.extract_title(src)
       doc = Nokogiri.HTML(src)
-      return doc.xpath('//div[@id="HeadLine"]//h1[1]/text()').text.strip
+      return doc.xpath('//*[@id="MainInner"]/div[1]/div/h1/text()').text.strip
     end
 
     def self.extract_published_time(src)
@@ -34,10 +34,10 @@ module Asahi
     def self.extract_images(src, url)
       doc = Nokogiri.HTML(src)
       images = []
-      images += doc.xpath('//div[@id="MainInner"]//table[@class="ThmbColTb"]//p').map { |parag|
+      images += doc.xpath('//*[@id="MainInner"]/div[3]/div[1]/div/p').map { |parag|
         img     = parag.xpath('.//img').first || next
         url     = URI.join(url, img[:src].strip).to_s
-        caption = parag.xpath('./small/text()').text.strip
+        caption = parag.xpath('.//em').text.strip
         {:url => url, :caption => caption}
       }.compact
       # MEMO: 画像が大きすぎるため、コメントアウト
@@ -59,7 +59,7 @@ module Asahi
         each   { |node| node.remove }
 
       # 本文のdiv要素を取得
-      body = doc.xpath('//div[@id="MainInner"]//div[@class="BodyTxt"]').first
+      body = doc.xpath('//*[@id="MainInner"]/div[3]/div[3]').first
       # 本文の不要なclass属性を削除
       body.remove_attribute("class")
       # 本文内のp要素のテキストをクリーンアップ
@@ -67,10 +67,10 @@ module Asahi
         text = node.text.strip
         text.sub!(/^　/, "")
         # for Kindle 3
-        text.gsub!(/◇/, "<>") # U+25C7 -> ASCII
-        text.gsub!(/─/, "―") # U+2500 -> U+2015
-        text.gsub!(/━/, "―") # U+2501 -> U+2015
-        text.gsub!(/～/, "〜") # U+FF5E -> U+301C
+        #text.gsub!(/◇/, "<>") # U+25C7 -> ASCII
+        #text.gsub!(/─/, "―") # U+2500 -> U+2015
+        #text.gsub!(/━/, "―") # U+2501 -> U+2015
+        #text.gsub!(/～/, "〜") # U+FF5E -> U+301C
         node.replace(Nokogiri::XML::Text.new(text, doc))
       }
 
