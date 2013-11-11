@@ -21,7 +21,7 @@ module Asahi
 
     def self.extract_title(src)
       doc = Nokogiri.HTML(src)
-      return doc.xpath('//*[@id="MainInner"]/div[1]/div/h1/text()').text.strip
+      return doc.xpath('//*[@id="MainInner"]//h1/text()').text.strip
     end
 
     def self.extract_published_time(src)
@@ -34,7 +34,7 @@ module Asahi
     def self.extract_images(src, url)
       doc = Nokogiri.HTML(src)
       images = []
-      images += doc.xpath('//*[@id="MainInner"]/div[3]/div[1]/div/p').map { |parag|
+      images += doc.xpath('//*[@id="MainInner"]//div[@class="Image"]/p').map { |parag|
         img     = parag.xpath('.//img').first || next
         url     = URI.join(url, img[:src].strip).to_s
         caption = parag.xpath('.//em').text.strip
@@ -59,7 +59,7 @@ module Asahi
         each   { |node| node.remove }
 
       # 本文のdiv要素を取得
-      body = doc.xpath('//*[@id="MainInner"]/div[3]/div[3]').first
+      body = doc.xpath('//*[@id="MainInner"]//div[@class="ArticleText"]').first
       # 本文の不要なclass属性を削除
       body.remove_attribute("class")
       # 本文内のp要素のテキストをクリーンアップ
