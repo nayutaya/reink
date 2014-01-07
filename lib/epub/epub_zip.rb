@@ -16,7 +16,7 @@ module Reink
 
       def write(filename)
         File.unlink(filename) if File.exist?(filename)
-        Zip::ZipFile.open(filename, Zip::ZipFile::CREATE) { |zip|
+        Zip::File.open(filename, Zip::File::CREATE) { |zip|
           @entries.each { |entry|
             zip.get_output_stream(entry[:filename]) { |io|
               io.write(entry[:content])
