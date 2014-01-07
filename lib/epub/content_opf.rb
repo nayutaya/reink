@@ -15,7 +15,7 @@ module Reink
         @items     = []
         @itemrefs  = []
 
-        @template = File.open(File.join(File.dirname(__FILE__), "content.opf.erb"), "rb") { |file| file.read }
+        @template = File.open(File.join(File.dirname(__FILE__), "content.opf.erb"), "rb:utf-8") { |file| file.read }
       end
 
       attr_accessor :uuid, :title, :author, :publisher, :items, :itemrefs

@@ -13,7 +13,7 @@ module Reink
         @author     = nil
         @nav_points = []
 
-        @template = File.open(File.join(File.dirname(__FILE__), "toc.ncx.erb"), "rb") { |file| file.read }
+        @template = File.open(File.join(File.dirname(__FILE__), "toc.ncx.erb"), "rb:utf-8") { |file| file.read }
       end
 
       attr_accessor :uuid, :title, :author, :nav_points

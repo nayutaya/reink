@@ -10,7 +10,7 @@ module Reink
       def initialize
         @items = []
 
-        @template = File.open(File.join(File.dirname(__FILE__), "toc.xhtml.erb"), "rb") { |file| file.read }
+        @template = File.open(File.join(File.dirname(__FILE__), "toc.xhtml.erb"), "rb:utf-8") { |file| file.read }
       end
 
       attr_accessor :items

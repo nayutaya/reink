@@ -4,7 +4,7 @@ module Reink
   module Epub
     class ContainerXml
       def initialize
-        @body = File.open(File.join(File.dirname(__FILE__), "container.xml"), "rb") { |file| file.read }
+        @body = File.open(File.join(File.dirname(__FILE__), "container.xml"), "rb:utf-8") { |file| file.read }
       end
 
       def to_s

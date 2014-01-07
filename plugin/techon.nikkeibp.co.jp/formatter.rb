@@ -6,7 +6,7 @@ module TechOn
   module Formatter
     def self.format(article)
       filename = File.join(File.dirname(__FILE__), "template.xhtml.erb")
-      template = File.open(filename, "rb") { |file| file.read }
+      template = File.open(filename, "rb:utf-8") { |file| file.read }
 
       env = Object.new
       env.extend(ERB::Util)

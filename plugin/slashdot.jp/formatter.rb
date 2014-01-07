@@ -6,7 +6,7 @@ module Slashdot
   module Formatter
     def self.format(article)
       filename = File.join(File.dirname(__FILE__), "template.xhtml.erb")
-      template = File.open(filename, "rb") { |file| file.read }
+      template = File.open(filename, "rb:utf-8") { |file| file.read }
 
       comments = self.format_comments(article[:comments])
 
@@ -36,7 +36,7 @@ module Slashdot
 
     def self.format_comment(comment, nest)
       filename = File.join(File.dirname(__FILE__), "comment.xhtml.erb")
-      template = File.open(filename, "rb") { |file| file.read }
+      template = File.open(filename, "rb:utf-8") { |file| file.read }
 
       children =
         if comment[:comments].empty?
