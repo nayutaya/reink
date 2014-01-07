@@ -1,7 +1,7 @@
 # coding: utf-8
 
 require "rubygems"
-require "zip/zip"
+require "zip"
 
 module Reink
   module Epub
